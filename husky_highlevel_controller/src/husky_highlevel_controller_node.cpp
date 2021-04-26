@@ -1,20 +1,21 @@
 #include "ros/ros.h"
 #include "sensor_msgs/LaserScan.h"
+#include "limits"
 
 ros::Publisher publisher;
-
+double last_min;
 void scannerCallback(const sensor_msgs::LaserScan& msg)
 {
-	//msg.ranges
-	//for(int i = 0; i < sizeof(msg.ranges) / sizeof(msg.ranges[0]); i++)
-	//{
-	//	if(msg.ranges[i] == msg.range_min)
-	//	{
-	//		break;
-	//	}
-	//}
-	publisher.publish(msg);
-	ROS_INFO("I heard: [%f]", msg.range_min);
+	for(float f:msg.ranges)
+	{
+		if(f< last_min)
+		{
+			last_min = f;
+		}
+	}
+	
+	//publisher.publish(msg);
+	ROS_INFO("I heard: [%11.5f]", last_min);
 }
 
 
@@ -23,7 +24,7 @@ int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "listener");
 	ros::NodeHandle nodeHandle;
-	
+	last_min = std::numeric_limits<float>::infinity();
 	//load params
 	std::string topic_name;
 	if(!nodeHandle.getParam("scan/topic_name", topic_name))
