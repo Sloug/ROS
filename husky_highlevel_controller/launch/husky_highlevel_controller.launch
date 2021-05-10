@@ -17,5 +17,5 @@
         <remap from="cmd_vel" to="/husky_velocity_controller/cmd_vel"/>
     </node>-->
 
-    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find husky_highlevel_controller)/config/aufgabe2.rviz"/>/>
+    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find husky_highlevel_controller)/config/aufgabe2.rviz"/>
 </launch>

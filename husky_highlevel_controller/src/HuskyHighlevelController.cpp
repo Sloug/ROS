@@ -2,20 +2,45 @@
 #include <string>
 #include <iterator>
 #include <algorithm>
+#include <math.h>
+
+
 
 namespace husky_highlevel_controller
 {
     HuskyHighlevelController::HuskyHighlevelController(ros::NodeHandle& node_handle) :
     node_handle_(node_handle) {}
+    ros::Publisher publisher;
 
     HuskyHighlevelController::~HuskyHighlevelController() {}
 
     void HuskyHighlevelController::laserScanCallback(const sensor_msgs::LaserScan& msg)
     {
+        int i  = std::min_element(std::begin(msg.ranges),std::end(msg.ranges)) - std::begin(msg.ranges);
+        double min_dist = *std::min_element(std::begin(msg.ranges), std::end(msg.ranges));
         ROS_INFO(
-            "Smallest distance: %f",
-            *std::min_element(std::begin(msg.ranges), std::end(msg.ranges))
+            "Smallest distance: %f",min_dist            
         );
+        //calc rigth or left
+        double angle= (msg.angle_min + i * msg.angle_increment);
+        //p param auslesen
+        ROS_INFO(
+            "Angle to pillar: %f",angle            
+        );
+        float p = 0.0;
+        if ( !node_handle_.getParam("controll_parameter/p", p) )
+            ROS_ERROR("Could not find topic parameter!");
+        //geometry_twist msg aufbauen 
+        if(min_dist > 0.16){
+            geometry_msgs::Twist c_msg;
+            c_msg.linear.x = min_dist * p; 
+            c_msg.angular.z =  -angle * p;
+            publisher.publish(c_msg);
+        }
+
+        
+
+
     }
 
     void HuskyHighlevelController::listen()
@@ -35,10 +60,36 @@ namespace husky_highlevel_controller
             this
         );
         
-        ros::Publisher publisher =
-		nodeHandle.advertise<geometry_msgs>("/cmd_vel",
+       publisher =
+		node_handle_.advertise<geometry_msgs::Twist>("/cmd_vel",
 		queue_size);
 
+    ros::Publisher vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );
+        visualization_msgs::Marker marker;
+        marker.header.frame_id = "laser_frame";
+        marker.header.stamp = ros::Time();
+        marker.ns = "husky_highlevel_controller";
+        marker.id = 0;
+        marker.type = visualization_msgs::Marker::CYLINDER;
+        marker.action = visualization_msgs::Marker::ADD;
+        marker.pose.position.x = 20.0;
+        marker.pose.position.y = 5.0;
+        marker.pose.position.z = 0.0;
+        marker.pose.orientation.x = 0.0;
+        marker.pose.orientation.y = 0.0;
+        marker.pose.orientation.z = 0.0;
+        marker.pose.orientation.w = 1.0;
+        marker.scale.x = 2.2;
+        marker.scale.y = 2.2;
+        marker.scale.z = 2;
+        marker.color.a = 1.0; // Don't forget to set the alpha!
+        marker.color.r = 0.0;
+        marker.color.g = 1.0;
+        marker.color.b = 0.0;
+        //only if using a MESH_RESOURCE marker type:
+        //marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
+        vis_pub.publish( marker );
+        
         
         ros::spin();
     }
