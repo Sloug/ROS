@@ -11,6 +11,8 @@ namespace husky_highlevel_controller
     HuskyHighlevelController::HuskyHighlevelController(ros::NodeHandle& node_handle) :
     node_handle_(node_handle) {}
     ros::Publisher publisher;
+    ros::Publisher vis_pub;
+    visualization_msgs::Marker marker;
 
     HuskyHighlevelController::~HuskyHighlevelController() {}
 
@@ -37,6 +39,27 @@ namespace husky_highlevel_controller
             c_msg.angular.z =  -angle * p;
             publisher.publish(c_msg);
         }
+        marker.header.frame_id = "base_laser";
+        marker.header.stamp = ros::Time();
+        marker.ns = "husky_ctrl";
+        marker.id = 0;
+        marker.type = visualization_msgs::Marker::CYLINDER;
+        marker.action = visualization_msgs::Marker::ADD;
+        marker.pose.position.x = cos(angle)*min_dist+0.2;
+        marker.pose.position.y = sin(angle)*min_dist;
+        marker.pose.position.z = 1.0;
+        marker.pose.orientation.x = 0.0;
+        marker.pose.orientation.y = 0.0;
+        marker.pose.orientation.z = 0.0;
+        marker.pose.orientation.w = 1.0;
+        marker.scale.x = 0.4;
+        marker.scale.y = 0.4;
+        marker.scale.z = 2;
+        marker.color.a = 1.0; // Don't forget to set the alpha!
+        marker.color.r = 0.0;
+        marker.color.g = 1.0;
+        marker.color.b = 0.0;
+         vis_pub.publish( marker );
 
         
 
@@ -64,31 +87,12 @@ namespace husky_highlevel_controller
 		node_handle_.advertise<geometry_msgs::Twist>("/cmd_vel",
 		queue_size);
 
-    ros::Publisher vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );
-        visualization_msgs::Marker marker;
-        marker.header.frame_id = "laser_frame";
-        marker.header.stamp = ros::Time();
-        marker.ns = "husky_highlevel_controller";
-        marker.id = 0;
-        marker.type = visualization_msgs::Marker::CYLINDER;
-        marker.action = visualization_msgs::Marker::ADD;
-        marker.pose.position.x = 20.0;
-        marker.pose.position.y = 5.0;
-        marker.pose.position.z = 0.0;
-        marker.pose.orientation.x = 0.0;
-        marker.pose.orientation.y = 0.0;
-        marker.pose.orientation.z = 0.0;
-        marker.pose.orientation.w = 1.0;
-        marker.scale.x = 2.2;
-        marker.scale.y = 2.2;
-        marker.scale.z = 2;
-        marker.color.a = 1.0; // Don't forget to set the alpha!
-        marker.color.r = 0.0;
-        marker.color.g = 1.0;
-        marker.color.b = 0.0;
+     vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );
+       
+        
         //only if using a MESH_RESOURCE marker type:
         //marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
-        vis_pub.publish( marker );
+       
         
         
         ros::spin();
