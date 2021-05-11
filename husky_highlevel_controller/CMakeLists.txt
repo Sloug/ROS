@@ -9,6 +9,10 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   geometry_msgs
+  visualization_msgs
+  tf
+  tf2
+  tf2_ros
 )
 
 ###################################
@@ -29,6 +33,9 @@ catkin_package(
     sensor_msgs
     geometry_msgs
     visualization_msgs
+    tf
+    tf2
+    tf2_ros
 #  DEPENDS
 )
 

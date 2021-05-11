@@ -3,16 +3,22 @@
 #include <iterator>
 #include <algorithm>
 #include <math.h>
-
+#include <tf/transform_listener.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <tf2/utils.h>
 
 
 namespace husky_highlevel_controller
 {
     HuskyHighlevelController::HuskyHighlevelController(ros::NodeHandle& node_handle) :
-    node_handle_(node_handle) {}
+    node_handle_(node_handle){
+       // tf::TransformListener listener;
+    }
     ros::Publisher publisher;
     ros::Publisher vis_pub;
     visualization_msgs::Marker marker;
+     
+   
 
     HuskyHighlevelController::~HuskyHighlevelController() {}
 
@@ -47,7 +53,7 @@ namespace husky_highlevel_controller
         marker.action = visualization_msgs::Marker::ADD;
         marker.pose.position.x = cos(angle)*min_dist+0.2;
         marker.pose.position.y = sin(angle)*min_dist;
-        marker.pose.position.z = 1.0;
+        marker.pose.position.z = -0.5;
         marker.pose.orientation.x = 0.0;
         marker.pose.orientation.y = 0.0;
         marker.pose.orientation.z = 0.0;
@@ -59,9 +65,26 @@ namespace husky_highlevel_controller
         marker.color.r = 0.0;
         marker.color.g = 1.0;
         marker.color.b = 0.0;
-         vis_pub.publish( marker );
-
+        vis_pub.publish(marker);
+        tf::StampedTransform transform;
         
+        try{
+            marker.header.frame_id = "odom";
+            listener_.lookupTransform("odom", "base_laser",ros::Time(0),transform);
+            geometry_msgs::Pose pose;
+            
+            marker.id = 1;
+            marker.color.g= 0.0;
+            marker.color.b = 1.0;
+            marker.pose.position.x = transform.getOrigin().x()+ cos(angle)*min_dist+0.2;
+            marker.pose.position.y = transform.getOrigin().y()+ sin(-angle)*min_dist;;
+            vis_pub.publish(marker);
+        }    
+        catch (tf::TransformException &ex) {
+             ROS_ERROR("%s",ex.what());
+        }
+        
+            
 
 
     }
@@ -82,12 +105,11 @@ namespace husky_highlevel_controller
             &HuskyHighlevelController::laserScanCallback,
             this
         );
-        
        publisher =
 		node_handle_.advertise<geometry_msgs::Twist>("/cmd_vel",
 		queue_size);
 
-     vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );
+        vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );
        
         
         //only if using a MESH_RESOURCE marker type:
