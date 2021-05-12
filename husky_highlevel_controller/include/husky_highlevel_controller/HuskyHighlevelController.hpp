@@ -29,7 +29,8 @@ public:
 private:
 	ros::NodeHandle node_handle_;
     ros::Subscriber laser_scan_subscriber_;
-    tf::TransformListener listener_;
+    tf2_ros::TransformListener listener_;
+    tf2_ros::Buffer tf_buffer_;
 
     void laserScanCallback(const sensor_msgs::LaserScan& msg);
 };

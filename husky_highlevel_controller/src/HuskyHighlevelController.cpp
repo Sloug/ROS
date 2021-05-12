@@ -11,7 +11,7 @@
 namespace husky_highlevel_controller
 {
     HuskyHighlevelController::HuskyHighlevelController(ros::NodeHandle& node_handle) :
-    node_handle_(node_handle){
+    node_handle_(node_handle),listener_(tf_buffer_){
        // tf::TransformListener listener;
     }
     ros::Publisher publisher;
@@ -66,18 +66,17 @@ namespace husky_highlevel_controller
         marker.color.g = 1.0;
         marker.color.b = 0.0;
         vis_pub.publish(marker);
-        tf::StampedTransform transform;
+        geometry_msgs::TransformStamped transform;
         
         try{
             marker.header.frame_id = "odom";
-            listener_.lookupTransform("odom", "base_laser",ros::Time(0),transform);
+            transform = tf_buffer_.lookupTransform("odom", "base_laser",ros::Time(0));
             geometry_msgs::Pose pose;
-            
+            tf2::doTransform(marker.pose,pose,transform);
             marker.id = 1;
+            marker.pose = pose;
             marker.color.g= 0.0;
             marker.color.b = 1.0;
-            marker.pose.position.x = transform.getOrigin().x()+ cos(angle)*min_dist+0.2;
-            marker.pose.position.y = transform.getOrigin().y()+ sin(-angle)*min_dist;;
             vis_pub.publish(marker);
         }    
         catch (tf::TransformException &ex) {
