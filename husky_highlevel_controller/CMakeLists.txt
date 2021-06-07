@@ -57,6 +57,10 @@ add_executable(${PROJECT_NAME}
   src/${PROJECT_NAME}_node.cpp
   src/HuskyHighlevelController.cpp
 )
+add_executable(${PROJECT_NAME}_drive
+  src/${PROJECT_NAME}_drive_node.cpp
+  src/HuskyHighlevelControllerDrive.cpp
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}
