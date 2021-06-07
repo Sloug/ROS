@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   geometry_msgs
   visualization_msgs
+  husky_highlevel_controller_msgs
   tf
   tf2
   tf2_ros
@@ -36,6 +37,7 @@ catkin_package(
     tf
     tf2
     tf2_ros
+    husky_highlevel_controller_msgs
 #  DEPENDS
 )
 

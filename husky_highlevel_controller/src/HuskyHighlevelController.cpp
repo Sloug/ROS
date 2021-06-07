@@ -6,7 +6,7 @@
 #include <tf/transform_listener.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2/utils.h>
-
+#include <husky_highlevel_controller_msgs/Position.h>
 
 namespace husky_highlevel_controller
 {
@@ -39,12 +39,18 @@ namespace husky_highlevel_controller
         if ( !node_handle_.getParam("controll_parameter/p", p) )
             ROS_ERROR("Could not find topic parameter!");
         //geometry_twist msg aufbauen 
-        if(min_dist > 0.16){
-            geometry_msgs::Twist c_msg;
-            c_msg.linear.x = min_dist * p; 
-            c_msg.angular.z =  -angle * p;
-            publisher.publish(c_msg);
-        }
+        husky_highlevel_controller_msgs::Position message;
+        message.angle = angle;
+        message.dist = min_dist;
+        message.header.frame_id = "base_laser";
+        message.header.stamp = ros::Time();        
+        publisher.publish(message);
+        //if(min_dist > 0.16){
+        //    geometry_msgs::Twist c_msg;
+        //    c_msg.linear.x = min_dist * p; 
+        //    c_msg.angular.z =  -angle * p;
+        //    publisher.publish(c_msg);
+        //}
         marker.header.frame_id = "base_laser";
         marker.header.stamp = ros::Time();
         marker.ns = "husky_ctrl";
@@ -105,7 +111,7 @@ namespace husky_highlevel_controller
             this
         );
        publisher =
-		node_handle_.advertise<geometry_msgs::Twist>("/cmd_vel",
+		node_handle_.advertise<husky_highlevel_controller_msgs::Position>("position",
 		queue_size);
 
         vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );
