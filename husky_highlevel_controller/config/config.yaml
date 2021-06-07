@@ -1,6 +1,9 @@
 laser:
   topic: /scan
   queue_size: 10
+drive:
+  topic: /husky_ctrl/postion
+  queue_size: 10
 controll_parameter:
   p: 0.5
   i: 0.0
