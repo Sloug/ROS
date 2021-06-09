@@ -1,4 +1,4 @@
-#include "husky_highlevel_controller/HuskyHighlevelController.hpp"
+#include "husky_highlevel_controller_drive/HuskyHighlevelControllerDrive.hpp"
 #include <string>
 #include <iterator>
 #include <algorithm>
@@ -7,31 +7,53 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2/utils.h>
 #include <husky_highlevel_controller_msgs/Position.h>
+#include <husky_highlevel_controller_msgs/driveAction.h>
+#include <actionlib/server/simple_action_server.h>
 
 namespace husky_highlevel_controller_drive
 {
-    HuskyHighlevelControllerDrive::HuskyHighlevelControllerDrive(ros::NodeHandle& node_handle) :
-    node_handle_(node_handle),listener_(tf_buffer_){
-       // tf::TransformListener listener;
-    }
     ros::Publisher publisher;
-    ros::Publisher vis_pub;
-    visualization_msgs::Marker marker;
-     
-   
+    bool listenF = false;
+    bool finish = false;
+    // bool active = false;
+    HuskyHighlevelControllerDrive::HuskyHighlevelControllerDrive(ros::NodeHandle& node_handle) :
+    node_handle_(node_handle),
+    as_(node_handle_, "drive_server", boost::bind(&HuskyHighlevelControllerDrive::executeCB, this, _1), false),
+    action_name_("drive_server")    
+    {
+        as_.start();
+        listen();
+    }
+    
 
     HuskyHighlevelControllerDrive::~HuskyHighlevelControllerDrive() {}
 
     void HuskyHighlevelControllerDrive::driveCallback(const husky_highlevel_controller_msgs::Position& msg)
     {   
+
+        if(!listenF){
+            return;
+        }
+        //check preented return / callback abmelden
         float p = 0.0;
         if ( !node_handle_.getParam("controll_parameter/p", p) )
             ROS_ERROR("Could not find topic parameter!");
-        if(min_dist > 0.16){
+        if(msg.dist > 0.16){
+            
             geometry_msgs::Twist c_msg;
             c_msg.linear.x = msg.dist*p; 
             c_msg.angular.z =  -msg.angle*p;
+            feedback_.dist = msg.dist;
+            //as_.setAccepted();
+            as_.publishFeedback(feedback_);
             publisher.publish(c_msg);
+            // as_.setPreempted();
+        }else{
+            result_.success = true;
+            //flag true
+            finish = true;
+            //as_.setSucceeded(result_);
+            listenF = false;
         }
        
     }
@@ -55,14 +77,31 @@ namespace husky_highlevel_controller_drive
        publisher =
 		node_handle_.advertise<geometry_msgs::Twist>("/cmd_vel",
 		queue_size);
-
-       
-        
-        //only if using a MESH_RESOURCE marker type:
-        //marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
-       
-        
-        
-        ros::spin();
     }
+
+    void HuskyHighlevelControllerDrive::executeCB(const husky_highlevel_controller_msgs::driveGoalConstPtr &goal)
+    {
+            
+             //as_.acceptNewGoal();
+            listenF = true;
+            while (!finish) {
+                
+            }
+            as_.setSucceeded();
+            return;
+            // if(goal->go){
+                
+            //     listenF = true;
+                
+            // }else{
+            //     listenF = false;
+            //     as_.setPreempted();
+            //     return;
+            // }
+        
+        
+        
+    }
+    
+
 } 

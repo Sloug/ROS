@@ -1,0 +1,8 @@
+# Define the goal
+bool go # Specify which dishwasher we want to use
+---
+# Define the result
+bool success
+---
+# Define a feedback message
+float64 dist

@@ -26,15 +26,15 @@ namespace husky_highlevel_controller
     {
         int i  = std::min_element(std::begin(msg.ranges),std::end(msg.ranges)) - std::begin(msg.ranges);
         double min_dist = *std::min_element(std::begin(msg.ranges), std::end(msg.ranges));
-        ROS_INFO(
-            "Smallest distance: %f",min_dist            
-        );
+        //ROS_INFO(
+         //   "Smallest distance: %f",min_dist            
+        //);
         //calc rigth or left
         double angle= (msg.angle_min + i * msg.angle_increment);
         //p param auslesen
-        ROS_INFO(
-            "Angle to pillar: %f",angle            
-        );
+        //ROS_INFO(
+         //   "Angle to pillar: %f",angle            
+        //);
         float p = 0.0;
         if ( !node_handle_.getParam("controll_parameter/p", p) )
             ROS_ERROR("Could not find topic parameter!");
@@ -42,7 +42,7 @@ namespace husky_highlevel_controller
         husky_highlevel_controller_msgs::Position message;
         message.angle = angle;
         message.dist = min_dist;
-        message.header.frame_id = "base_laser";
+        message.header.frame_id = "odom";
         message.header.stamp = ros::Time();        
         publisher.publish(message);
         //if(min_dist > 0.16){
@@ -103,15 +103,21 @@ namespace husky_highlevel_controller
         int queue_size;
         if ( !node_handle_.getParam("laser/queue_size", queue_size) )
             ROS_ERROR("Could not find queue_size parameter!");
-
+       
         laser_scan_subscriber_ = node_handle_.subscribe(
             topic,
             queue_size,
             &HuskyHighlevelController::laserScanCallback,
             this
         );
+         if ( !node_handle_.getParam("drive/topic", topic) )
+            ROS_ERROR("Could not find topic parameter!");
+
+        if ( !node_handle_.getParam("drive/queue_size", queue_size) )
+            ROS_ERROR("Could not find queue_size parameter!");
+
        publisher =
-		node_handle_.advertise<husky_highlevel_controller_msgs::Position>("position",
+		node_handle_.advertise<husky_highlevel_controller_msgs::Position>(topic,
 		queue_size);
 
         vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );

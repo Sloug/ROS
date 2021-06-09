@@ -8,13 +8,13 @@
         <arg name="world_name" value="$(arg world_name)"/>
         <arg name="laser_enabled" value="$(arg laser_enabled)"/>
     </include>
-
+    <node name="husky_drive" pkg="husky_highlevel_controller_drive" type="husky_highlevel_controller_drive" output="screen">
+        <rosparam command="load" file="$(find husky_highlevel_controller)/config/config.yaml" />
+    </node>
     <node name="husky_ctrl" pkg="husky_highlevel_controller" type="husky_highlevel_controller" output="screen">
         <rosparam command="load" file="$(find husky_highlevel_controller)/config/config.yaml" />
     </node>
-    <node name="husky_drive" pkg="husky_highlevel_controller" type="husky_highlevel_controller_drive" output="screen">
-        <rosparam command="load" file="$(find husky_highlevel_controller)/config/config.yaml" />
-    </node>
+    
 
     <!--<node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
         <remap from="cmd_vel" to="/husky_velocity_controller/cmd_vel"/>

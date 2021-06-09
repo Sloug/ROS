@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(husky_highlevel_controller)
+cmake_minimum_required(VERSION 3.0.2)
+project(husky_highlevel_controller_client)
 
 ## Use C++11
 add_definitions(--std=c++11)
@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   tf2
   tf2_ros
+
 )
 
 ###################################
@@ -44,7 +45,13 @@ catkin_package(
 ###########
 ## Build ##
 ###########
-
+add_executable(${PROJECT_NAME}
+  src/husky_highlevel_controller_client.cpp
+)
+target_link_libraries( 
+  husky_highlevel_controller_client
+  ${catkin_LIBRARIES}
+)
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
@@ -52,11 +59,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a C++ executable
-add_executable(${PROJECT_NAME}
-  src/${PROJECT_NAME}_node.cpp
-  src/HuskyHighlevelController.cpp
-)
+
+
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}

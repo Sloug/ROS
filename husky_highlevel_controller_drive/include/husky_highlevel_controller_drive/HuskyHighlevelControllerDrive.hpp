@@ -9,6 +9,8 @@
 #include <tf2/utils.h>
 
 #include <husky_highlevel_controller_msgs/Position.h>
+#include <husky_highlevel_controller_msgs/driveAction.h>
+#include <actionlib/server/simple_action_server.h>
 namespace husky_highlevel_controller_drive {
 
 /*!
@@ -31,10 +33,12 @@ public:
 private:
 	ros::NodeHandle node_handle_;
     ros::Subscriber drive_subscriber_;
-    tf2_ros::TransformListener listener_;
-    tf2_ros::Buffer tf_buffer_;
-
+    actionlib::SimpleActionServer<husky_highlevel_controller_msgs::driveAction> as_;
+    husky_highlevel_controller_msgs::driveFeedback feedback_;
+    husky_highlevel_controller_msgs::driveResult result_;
+    std::string action_name_;
     void driveCallback(const husky_highlevel_controller_msgs::Position& msg);
+    void executeCB(const husky_highlevel_controller_msgs::driveGoalConstPtr &goal);
 };
 
 } /* namespace */

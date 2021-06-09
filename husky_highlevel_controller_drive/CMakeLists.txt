@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(husky_highlevel_controller)
+project(husky_highlevel_controller_drive)
 
 ## Use C++11
 add_definitions(--std=c++11)
@@ -14,8 +14,13 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   tf2
   tf2_ros
+  genmsg 
+  actionlib_msgs
+  actionlib
 )
 
+
+generate_messages(DEPENDENCIES actionlib_msgs)
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -38,6 +43,9 @@ catkin_package(
     tf2
     tf2_ros
     husky_highlevel_controller_msgs
+    genmsg 
+    actionlib_msgs
+    actionlib
 #  DEPENDS
 )
 
@@ -55,8 +63,9 @@ include_directories(
 ## Declare a C++ executable
 add_executable(${PROJECT_NAME}
   src/${PROJECT_NAME}_node.cpp
-  src/HuskyHighlevelController.cpp
+  src/HuskyHighlevelControllerDrive.cpp
 )
+
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}
