@@ -51,43 +51,43 @@ namespace husky_highlevel_controller
         //    c_msg.angular.z =  -angle * p;
         //    publisher.publish(c_msg);
         //}
-        marker.header.frame_id = "base_laser";
-        marker.header.stamp = ros::Time();
-        marker.ns = "husky_ctrl";
-        marker.id = 0;
-        marker.type = visualization_msgs::Marker::CYLINDER;
-        marker.action = visualization_msgs::Marker::ADD;
-        marker.pose.position.x = cos(angle)*min_dist+0.2;
-        marker.pose.position.y = sin(angle)*min_dist;
-        marker.pose.position.z = -0.5;
-        marker.pose.orientation.x = 0.0;
-        marker.pose.orientation.y = 0.0;
-        marker.pose.orientation.z = 0.0;
-        marker.pose.orientation.w = 1.0;
-        marker.scale.x = 0.4;
-        marker.scale.y = 0.4;
-        marker.scale.z = 2;
-        marker.color.a = 1.0; // Don't forget to set the alpha!
-        marker.color.r = 0.0;
-        marker.color.g = 1.0;
-        marker.color.b = 0.0;
-        vis_pub.publish(marker);
-        geometry_msgs::TransformStamped transform;
+        // marker.header.frame_id = "base_laser";
+        // marker.header.stamp = ros::Time();
+        // marker.ns = "husky_ctrl";
+        // marker.id = 0;
+        // marker.type = visualization_msgs::Marker::CYLINDER;
+        // marker.action = visualization_msgs::Marker::ADD;
+        // marker.pose.position.x = cos(angle)*min_dist+0.2;
+        // marker.pose.position.y = sin(angle)*min_dist;
+        // marker.pose.position.z = -0.5;
+        // marker.pose.orientation.x = 0.0;
+        // marker.pose.orientation.y = 0.0;
+        // marker.pose.orientation.z = 0.0;
+        // marker.pose.orientation.w = 1.0;
+        // marker.scale.x = 0.4;
+        // marker.scale.y = 0.4;
+        // marker.scale.z = 2;
+        // marker.color.a = 1.0; // Don't forget to set the alpha!
+        // marker.color.r = 0.0;
+        // marker.color.g = 1.0;
+        // marker.color.b = 0.0;
+        // vis_pub.publish(marker);
+        // geometry_msgs::TransformStamped transform;
         
-        try{
-            marker.header.frame_id = "odom";
-            transform = tf_buffer_.lookupTransform("odom", "base_laser",ros::Time(0));
-            geometry_msgs::Pose pose;
-            tf2::doTransform(marker.pose,pose,transform);
-            marker.id = 1;
-            marker.pose = pose;
-            marker.color.g= 0.0;
-            marker.color.b = 1.0;
-            vis_pub.publish(marker);
-        }    
-        catch (tf::TransformException &ex) {
-             ROS_ERROR("%s",ex.what());
-        }
+        // try{
+        //     marker.header.frame_id = "odom";
+        //     transform = tf_buffer_.lookupTransform("odom", "base_laser",ros::Time(0));
+        //     geometry_msgs::Pose pose;
+        //     tf2::doTransform(marker.pose,pose,transform);
+        //     marker.id = 1;
+        //     marker.pose = pose;
+        //     marker.color.g= 0.0;
+        //     marker.color.b = 1.0;
+        //     vis_pub.publish(marker);
+        // }    
+        // catch (tf::TransformException &ex) {
+        //      ROS_ERROR("%s",ex.what());
+        // }
         
             
 
@@ -120,7 +120,7 @@ namespace husky_highlevel_controller
 		node_handle_.advertise<husky_highlevel_controller_msgs::Position>(topic,
 		queue_size);
 
-        vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );
+        //vis_pub = node_handle_.advertise<visualization_msgs::Marker>( "marker", 0 );
        
         
         //only if using a MESH_RESOURCE marker type:

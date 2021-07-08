@@ -4,6 +4,7 @@ laser:
 drive:
   topic: /husky_ctrl/position
   queue_size: 10
+  cancel: true
 controll_parameter:
   p: 0.5
   i: 0.0

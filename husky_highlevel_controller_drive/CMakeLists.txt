@@ -14,13 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   tf2
   tf2_ros
-  genmsg 
-  actionlib_msgs
-  actionlib
+
 )
 
-
-generate_messages(DEPENDENCIES actionlib_msgs)
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -43,9 +39,6 @@ catkin_package(
     tf2
     tf2_ros
     husky_highlevel_controller_msgs
-    genmsg 
-    actionlib_msgs
-    actionlib
 #  DEPENDS
 )
 

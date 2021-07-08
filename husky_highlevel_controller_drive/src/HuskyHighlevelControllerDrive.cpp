@@ -21,6 +21,7 @@ namespace husky_highlevel_controller_drive
     as_(node_handle_, "drive_server", boost::bind(&HuskyHighlevelControllerDrive::executeCB, this, _1), false),
     action_name_("drive_server")    
     {
+        as_.registerPreemptCallback(boost::bind(&HuskyHighlevelControllerDrive::preemptCB, this));
         as_.start();
         listen();
     }
@@ -43,16 +44,11 @@ namespace husky_highlevel_controller_drive
             geometry_msgs::Twist c_msg;
             c_msg.linear.x = msg.dist*p; 
             c_msg.angular.z =  -msg.angle*p;
-            feedback_.dist = msg.dist;
-            //as_.setAccepted();
+            feedback_.dist = msg.dist;        
             as_.publishFeedback(feedback_);
-            publisher.publish(c_msg);
-            // as_.setPreempted();
-        }else{
-            result_.success = true;
-            //flag true
-            finish = true;
-            //as_.setSucceeded(result_);
+            publisher.publish(c_msg);            
+        }else{            
+            finish = true;            
             listenF = false;
         }
        
@@ -82,25 +78,23 @@ namespace husky_highlevel_controller_drive
     void HuskyHighlevelControllerDrive::executeCB(const husky_highlevel_controller_msgs::driveGoalConstPtr &goal)
     {
             
-             //as_.acceptNewGoal();
             listenF = true;
             while (!finish) {
                 
             }
-            as_.setSucceeded();
-            return;
-            // if(goal->go){
-                
-            //     listenF = true;
-                
-            // }else{
-            //     listenF = false;
-            //     as_.setPreempted();
-            //     return;
-            // }
+            result_.success = true;
+            as_.setSucceeded(result_);
+            return;      
         
-        
-        
+    }
+     void HuskyHighlevelControllerDrive::preemptCB()
+    {
+        listenF = false;
+        geometry_msgs::Twist breaks;
+
+        publisher.publish(breaks);
+
+        as_.setPreempted();
     }
     
 

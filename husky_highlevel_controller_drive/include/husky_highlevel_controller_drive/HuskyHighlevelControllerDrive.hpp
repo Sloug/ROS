@@ -39,6 +39,7 @@ private:
     std::string action_name_;
     void driveCallback(const husky_highlevel_controller_msgs::Position& msg);
     void executeCB(const husky_highlevel_controller_msgs::driveGoalConstPtr &goal);
+    void preemptCB();
 };
 
 } /* namespace */

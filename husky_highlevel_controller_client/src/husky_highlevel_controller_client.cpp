@@ -4,15 +4,29 @@
   #include <actionlib/client/simple_client_goal_state.h>
    #include <husky_highlevel_controller_msgs/driveAction.h>
    #include <cstdlib>
-void exitfunction(){
-ROS_INFO("Send Cancell.");
-  
-}
+
 void doneCB(const actionlib::SimpleClientGoalState &state, const husky_highlevel_controller_msgs::driveResultConstPtr &result)
 {
-     ROS_INFO(
-              "Goal was reached"       
+    std::string stateasstr = state.toString().c_str();
+    if (stateasstr == "PREEMPTED"){
+        ROS_INFO(
+              "Goal was canceled"       
           );
+
+
+    }else if (stateasstr == "SUCCEEDED"){
+        ROS_INFO(
+              "GOAL Reached"       
+          );
+
+    }else{
+        ROS_INFO(
+              "Server ended unplanned"       
+          );
+
+
+    }
+     
 }
 void activeCB()
 {
@@ -28,7 +42,7 @@ void feedbackCB(const husky_highlevel_controller_msgs::driveFeedbackConstPtr &fe
 int main (int argc, char **argv)
    {
    ros::init(argc, argv, "driveClient");
-   std::atexit(exitfunction);
+   ros::NodeHandle nh("~");
    husky_highlevel_controller_msgs::driveFeedback feedback_;
   // create the action client
   // true causes the client to spin its own thread
@@ -44,12 +58,23 @@ int main (int argc, char **argv)
   ac.sendGoal(goal, boost::bind(&doneCB, _1, _2),
                     boost::bind(&activeCB),
                     boost::bind(&feedbackCB, _1));
-  ac.waitForResult();
+
+  bool cancel;
+  if ( !nh.getParam("drive/cancel", cancel) )
+    ROS_ERROR("Could not find topic parameter!");
+    if(cancel){
+        ac.waitForResult(ros::Duration(2.0));
+        ac.cancelAllGoals();
+    }else{
+
+      ac.waitForResult();
+    }
+  
   //exit
+
+
+  
+  ac.cancelAllGoals();
   return 0;
   }
-//void serverDoneCB
-  //  void serverFeedbackCB(const husky_highlevel_controller_msgs::driveActionFeedback_ &feedback)
-  //   {
-  //       ROS_INFO("Server Feedback reached. Distance to pillar left: [%.2f]", feedback->distance);
-  //   }
+
